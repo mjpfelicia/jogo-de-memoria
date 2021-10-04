@@ -1,66 +1,68 @@
 const cards = document.querySelectorAll('.card');
-let hasFlippedCard = false;
-let firstCard, secondCard;
-let lockBoard = false;
+let temCartaoVirado = false; //tem o cartão virado
+let primeiroCartao, segundoCartao; // primeiro Cartão, segundo Cartão;
+let quadroBloqueado = false; // quadro de bloqueio
 
-function flipCard() {
-    if (lockBoard) return;
-    if (this === firstCard) return;
 
+// vira a carta
+function virarCarta() {
+    if (quadroBloqueado) return;
+    if (this === primeiroCartao) return;
     this.classList.add('flip');
-    if (!hasFlippedCard) {
-        hasFlippedCard = true;
-        firstCard = this;
+    if (!temCartaoVirado) {
+        temCartaoVirado = true;
+        primeiroCartao = this;
         return;
     }
 
-    secondCard = this;
-    hasFlippedCard = false;
-    checkForMatch();
+    segundoCartao = this;
+    temCartaoVirado = false;
+    verificaCorrespondencia();
 }
 
-
-function checkForMatch() {
-    if (firstCard.dataset.card === secondCard.dataset.card) {
+// verifique se há correspondência
+function verificaCorrespondencia() {
+    if (primeiroCartao.dataset.card === segundoCartao.dataset.card) {
         disableCards();
         return;
     }
 
-    unflipCards();
+    desviraCarta();
 }
-
+//desativar cartões
 function disableCards() {
-    firstCard.removeEventListener('click', flipCard);
-    secondCard.removeEventListener('click', flipCard);
+    primeiroCartao.removeEventListener('click', virarCarta);
+    segundoCartao.removeEventListener('click', virarCarta);
 
-    resetBoard();
+    reiniciarPlacar();
 }
-
-function unflipCards() {
-    lockBoard = true;
+// desvira carta
+function desviraCarta() {
+    quadroBloqueado = true;
 
     setTimeout(() => {
-        firstCard.classList.remove('flip');
-        secondCard.classList.remove('flip');
+        primeiroCartao.classList.remove('flip');
+        segundoCartao.classList.remove('flip');
 
-        resetBoard();
+        reiniciarPlacar();
     }, 1500);
 }
 
-
-function resetBoard() {
-    [hasFlippedCard, lockBoard] = [false, false];
-    [firstCard, secondCard] = [null, null];
+//reiniciar placa
+function reiniciarPlacar() {
+    [temCartaoVirado, quadroBloqueado] = [false, false];
+    [primeiroCartao, segundoCartao] = [null, null];
 }
 
-
-(function shuffle() {
+//embaralhar
+(function embaralhar() {
     cards.forEach((card) => {
-        let ramdomPosition = Math.floor(Math.random() * 12);
-        card.style.order = ramdomPosition;
+        let posicaoAleatoria = Math.floor(Math.random() * cards.length);
+        card.style.order = posicaoAleatoria;
     })
 })();
 
+
 cards.forEach((card) => {
-    card.addEventListener('click', flipCard)
+    card.addEventListener('click', virarCarta)
 });
